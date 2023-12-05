@@ -1,0 +1,72 @@
+include: "code.snk"
+
+localrules: download_go_data, mouse_get_adata
+
+rule mouse_sc_run_notebook:
+    input:
+        scrna="resources/mouse_sc/scRNAseq.h5ad",
+        goa_dir="resources/mouse_sc/goa",
+    output:
+        collect_figures_inputs('mouse_sc'),
+        notebook="notebooks/mouse_sc.ipynb",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    threads:
+        8
+    resources:
+        mem_mb=80000
+    log:
+        "logs/mouse_sc/run_notebook.log"
+    benchmark:
+        "benchmarks/mouse_sc/run_notebook.tsv"
+    shell:
+        "jupyter nbconvert --to notebook --execute workflow/mouse_sc/notebook.ipynb --output ../../{output.notebook}"
+
+rule mouse_sc_run_notebook_velocity:
+    input:
+        scrna="resources/mouse_sc/scRNAseq.h5ad",
+        scrna_splicing="resources/mouse_sc/scRNAseq_splicing.h5ad",
+    output:
+        collect_figures_inputs('mouse_sc_velocity'),
+        notebook="notebooks/mouse_sc_velocity.ipynb",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    threads:
+        8
+    resources:
+        mem_mb=80000
+    log:
+        "logs/mouse_sc/run_notebook_velocity.log"
+    benchmark:
+        "benchmarks/mouse_sc/run_notebook_velocity.tsv"
+    shell:
+        "jupyter nbconvert --to notebook --execute workflow/mouse_sc/notebook_velocity.ipynb --output ../../{output.notebook}"
+
+rule mouse_get_adata:
+    output:
+        scrna="resources/mouse_sc/scRNAseq.h5ad",
+        scrna_splicing="resources/mouse_sc/scRNAseq_splicing.h5ad",
+    log:
+        "logs/mouse_sc/mouse_get_adata.log"
+    benchmark:
+        "benchmarks/mouse_sc/mouse_get_adata.tsv"
+    shell:
+        '(echo "Loading data from https://singlecell.broadinstitute.org/single_cell/study/SCP1891 . In case of errors, log into the Single Cell Portal, download the files scRNAseq.h5ad and scRNAseq_splicing.h5ad manually, and place them in the resources/mouse_sc/ folder." && '
+        'mkdir -p resources/mouse_sc/ && '
+        'pushd resources/mouse_sc/ && '
+        'gsutil cp gs://fc-bc2c0991-f3b4-4ecd-9f98-b71a6d4c9ca3/scRNAseq.h5ad . && '
+        'gsutil cp gs://fc-bc2c0991-f3b4-4ecd-9f98-b71a6d4c9ca3/scRNAseq_splicing.h5ad .) &> {log}'
+
+rule download_go_data:
+    output:
+        goa_dir=directory("resources/mouse_sc/goa"),
+    log:
+        "logs/mouse_sc/download_go_data.log"
+    benchmark:
+        "benchmarks/mouse_sc/download_go_data.tsv"
+    shell:
+        '(mkdir -p resources/mouse_sc/goa/ && '
+        'pushd resources/mouse_sc/goa/ && '
+        'wget https://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Mus_musculus.gene_info.gz && '
+        'wget http://purl.obolibrary.org/obo/go/go-basic.obo && '
+        'wget https://ftp.ncbi.nih.gov/gene/DATA/gene2go.gz) &> {log}'

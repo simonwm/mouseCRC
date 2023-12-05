@@ -1,0 +1,5 @@
+
+def tcga_targets():
+    return [
+        "notebooks/tcga.ipynb"
+    ]

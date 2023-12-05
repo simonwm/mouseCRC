@@ -1,0 +1,36 @@
+include: "code.snk"
+
+localrules: mouse_load_cartana
+
+rule mouse_cartana_run_notebook:
+    input:
+        scrna="resources/mouse_sc/scRNAseq.h5ad",
+        cartana="resources/mouse_cartana/mouse_cartana.csv.gz",
+    output:
+        collect_figures_inputs('mouse_cartana'),
+        notebook="notebooks/mouse_cartana.ipynb",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    threads:
+        8
+    resources:
+        mem_mb=160000
+    log:
+        "logs/mouse_cartana/run_notebook.log"
+    benchmark:
+        "benchmarks/mouse_cartana/run_notebook.tsv"
+    shell:
+        "jupyter nbconvert --to notebook --execute workflow/mouse_cartana/notebook.ipynb --output ../../{output.notebook}"
+
+rule mouse_load_cartana:
+    output:
+        cartana="resources/mouse_cartana/mouse_cartana.csv.gz",
+    log:
+        "logs/mouse_cartana/mouse_load_cartana.log"
+    benchmark:
+        "benchmarks/mouse_cartana/mouse_load_cartana.tsv"
+    shell:
+        '(echo "Loading data from https://singlecell.broadinstitute.org/single_cell/study/SCP1891 . In case of errors, log into the Single Cell Portal, download the file mouse_cartana.csv.gz manually, and place it in the resources/mouse_cartana/ folder." && '
+        'mkdir -p resources/mouse_cartana/ && '
+        'pushd resources/mouse_cartana/ && '
+        'gsutil cp gs://fc-bc2c0991-f3b4-4ecd-9f98-b71a6d4c9ca3/mouse_cartana.csv.gz .) &> {log}'

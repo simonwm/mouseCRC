@@ -1,0 +1,12 @@
+include: "collect_figures/Snakefile"
+include: "mouse_sc/Snakefile"
+include: "mouse_slideseq/Snakefile"
+include: "mouse_cartana/Snakefile"
+include: "human_sc/Snakefile"
+include: "tcga/Snakefile"
+
+include: "code.snk"
+
+rule all:
+    input:
+        *all_targets()

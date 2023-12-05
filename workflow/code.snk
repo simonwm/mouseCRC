@@ -1,0 +1,10 @@
+
+def all_targets():
+    return [
+		*mouse_sc_targets(),
+		*mouse_slideseq_targets(),
+		*mouse_cartana_targets(),
+		*human_sc_targets(),
+		*tcga_targets(),
+		*collect_figures_targets(),
+    ]

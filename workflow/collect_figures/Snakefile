@@ -1,0 +1,15 @@
+include: "code.snk"
+
+localrules: collect_figures
+
+rule collect_figures:
+    input:
+        collect_figures_inputs(),
+    output:
+        collect_figures_targets(),
+    log:
+        "logs/mouse/collect_figures.log"
+    benchmark:
+        "benchmarks/mouse/collect_figures.tsv"
+    run:
+        collect_figures()

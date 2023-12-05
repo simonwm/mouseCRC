@@ -1,0 +1,366 @@
+include: "code.snk"
+
+localrules: hsc_download_Becker_count_archive, hsc_download_Pelka_count_data, hsc_download_Zheng_count_archive, hsc_download_Khaliq_count_data, hsc_download_Che_count_data
+
+rule hsc_run_notebook:
+    input:
+        scrna="resources/mouse_sc/scRNAseq.h5ad",
+        slideseq="resources/mouse_slideseq/slideseq.h5ad",
+        slideseq_by_compartment="resources/mouse_slideseq/slideseq_by_compartment.h5ad",
+        snrna_pelka="results/human_sc/data/Pelka.h5ad",
+        mgi_hom_mh="resources/human_sc/MGI/HOM_MouseHumanSequence.rpt",
+    output:
+        collect_figures_inputs('human_sc'),
+        notebook="notebooks/human_sc.ipynb",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    threads:
+        8
+    resources:
+        mem_mb=80000
+    log:
+        "logs/human_sc/run_notebook.log"
+    benchmark:
+        "benchmarks/human_sc/run_notebook.tsv"
+    shell:
+        "jupyter nbconvert --to notebook --execute workflow/human_sc/notebook.ipynb --output ../../{output.notebook}"
+
+rule hsc_run_notebook_cross_study:
+    input:
+        scrna="resources/mouse_sc/scRNAseq.h5ad",
+        slideseq="resources/mouse_slideseq/slideseq.h5ad",
+        slideseq_by_compartment="resources/mouse_slideseq/slideseq_by_compartment.h5ad",
+        snrna_pelka="results/human_sc/data/Pelka.h5ad",
+        snrna_becker="results/human_sc/data/Becker.h5ad",
+        snrna_zheng="results/human_sc/data/Zheng.h5ad",
+        snrna_khaliq="results/human_sc/data/Khaliq.h5ad",
+        snrna_che="results/human_sc/data/Che.h5ad",
+        snrna_chen="results/human_sc/data/Chen.h5ad",
+        snrna_Joanito_3p="results/human_sc/data/Joanito_3p.h5ad",
+        snrna_Joanito_5p="results/human_sc/data/Joanito_5p.h5ad",
+        mgi_hom_all="resources/human_sc/MGI/HOM_AllOrganism.rpt",
+        cms_classes="results/human_sc/data/CMS_classification.tsv",
+    output:
+        collect_figures_inputs('human_sc_cross_study'),
+        notebook="notebooks/human_sc_cross_study.ipynb",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    threads:
+        8
+    resources:
+        mem_mb=100000
+    log:
+        "logs/human_sc/run_notebook_cross_study.log"
+    benchmark:
+        "benchmarks/human_sc/run_notebook_cross_study.tsv"
+    shell:
+        "jupyter nbconvert --to notebook --execute workflow/human_sc/notebook_cross_study.ipynb --output ../../{output.notebook}"
+
+rule hsc_run_CMS_classifier:
+    input:
+        "results/human_sc/data/CMS_classifier_input.csv"
+    output:
+        "results/human_sc/data/CMS_classification.tsv"
+    conda:
+        "../envs/R_CRC_scoring.yml"
+    threads:
+        1
+    resources:
+        mem_mb=20000
+    log:
+        "logs/human_sc/run_CMS_classifier.log"
+    benchmark:
+        "benchmarks/human_sc/run_CMS_classifier.tsv"
+    script:
+        "run_CMS_classifier.R"
+
+rule hsc_prep_CRC_classifier_inputs:
+    input:
+        scrna="resources/mouse_sc/scRNAseq.h5ad",
+        slideseq="resources/mouse_slideseq/slideseq.h5ad",
+        slideseq_by_compartment="resources/mouse_slideseq/slideseq_by_compartment.h5ad",
+        snrna_pelka="results/human_sc/data/Pelka.h5ad",
+        snrna_becker="results/human_sc/data/Becker.h5ad",
+        snrna_zheng="results/human_sc/data/Zheng.h5ad",
+        snrna_khaliq="results/human_sc/data/Khaliq.h5ad",
+        snrna_che="results/human_sc/data/Che.h5ad",
+        snrna_chen="results/human_sc/data/Chen.h5ad",
+        snrna_Joanito_3p="results/human_sc/data/Joanito_3p.h5ad",
+        snrna_Joanito_5p="results/human_sc/data/Joanito_5p.h5ad",
+        mgi_hom="resources/human_sc/MGI/HOM_AllOrganism.rpt",
+    output:
+        CMS_classifier_input="results/human_sc/data/CMS_classifier_input.csv",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    threads:
+        1
+    resources:
+        mem_mb=80000
+    log:
+        "logs/human_sc/prep_CRC_classifier_inputs.log"
+    benchmark:
+        "benchmarks/human_sc/prep_CRC_classifier_inputs.tsv"
+    script:
+        "prep_CRC_classifier_inputs.py"
+
+rule hsc_make_Joanito_count_adata:
+    input:
+        epi_count="resources/human_sc/Joanito/Epithelial_Count_matrix.h5",
+        epi_meta="resources/human_sc/Joanito/Epithelial_metadata.csv",
+        nonepi_count="resources/human_sc/Joanito/NonEpithelial_Count_matrix.h5",
+        nonepi_meta="resources/human_sc/Joanito/NonEpithelial_metadata.csv",
+        clinical_meta="resources/human_sc/Joanito/patient_clinical_information.csv",
+    output:
+        h5ad_3p="results/human_sc/data/Joanito_3p.h5ad",
+        h5ad_5p="results/human_sc/data/Joanito_5p.h5ad",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    resources:
+        mem_mb=20000
+    log:
+        "logs/human_sc/hsc_make_Joanito_count_adata.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_make_Joanito_count_adata.tsv"
+    script:
+        "make_Joanito_count_adata.py"
+
+rule hsc_download_Joanito_count_data:
+    output:
+        "resources/human_sc/Joanito/Epithelial_Count_matrix.h5",
+        "resources/human_sc/Joanito/Epithelial_metadata.csv",
+        "resources/human_sc/Joanito/NonEpithelial_Count_matrix.h5",
+        "resources/human_sc/Joanito/NonEpithelial_metadata.csv",
+        "resources/human_sc/Joanito/patient_clinical_information.csv",
+    conda:
+        "../envs/synapseclient_env.yml"
+    log:
+        "logs/human_sc/hsc_download_Joanito_count_data.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_download_Joanito_count_data.tsv"
+    shell:
+        '(mkdir -p resources/human_sc/Joanito/ && '
+        'pushd resources/human_sc/Joanito/ && '
+        'synapse get syn26844072 -v 1 && '
+        'synapse get syn26844073 -v 1 && '
+        'synapse get syn26844078 -v 1 && '
+        'synapse get syn39828012 -v 1 && ' # instead of syn39828012 and syn39828015 the manuscript used syn26844087 and syn26844111 which had more cells but were removed from synapse in the meantime. This results in quantitative differences in some analyses.
+        'synapse get syn39828015 -v 1) &> {log}'
+
+rule hsc_make_Chen_count_adata:
+    input:
+        abnormal_epi_h5ad="resources/human_sc/Chen/VUMC_ABNORMALS_EPI_V2.h5ad",
+        dis_epi_h5ad="resources/human_sc/Chen/VUMC_HTAN_DIS_EPI_V2.h5ad",
+        valdis_nonepi_h5ad="resources/human_sc/Chen/VUMC_HTAN_VAL_DIS_NONEPI_V2.h5ad",
+        val_epi_h5ad="resources/human_sc/Chen/VUMC_HTAN_VAL_EPI_V2.h5ad",
+    output:
+        h5ad="results/human_sc/data/Chen.h5ad",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    resources:
+        mem_mb=44000
+    log:
+        "logs/human_sc/hsc_make_Chen_count_adata.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_make_Chen_count_adata.tsv"
+    script:
+        "make_Chen_count_adata.py"
+
+rule hsc_download_Chen_count_data:
+    output:
+        "resources/human_sc/Chen/VUMC_ABNORMALS_EPI_V2.h5ad",
+        "resources/human_sc/Chen/VUMC_HTAN_DIS_EPI_V2.h5ad",
+        "resources/human_sc/Chen/VUMC_HTAN_VAL_DIS_NONEPI_V2.h5ad",
+        "resources/human_sc/Chen/VUMC_HTAN_VAL_EPI_V2.h5ad",
+    conda:
+        "../envs/synapseclient_env.yml"
+    log:
+        "logs/human_sc/hsc_download_Chen_count_data.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_download_Chen_count_data.tsv"
+    shell:
+        '(mkdir -p resources/human_sc/Chen/ && '
+        'pushd resources/human_sc/Chen/ && '
+        'synapse get syn27056096 -v 1 && '
+        'synapse get syn27056097 -v 1 && '
+        'synapse get syn27056098 -v 1 && '
+        'synapse get syn27056099 -v 1) &> {log}'
+        
+rule hsc_make_Che_count_adata:
+    input:
+        matrix="resources/human_sc/Che/GSE178318_matrix.mtx.gz",
+        genes="resources/human_sc/Che/GSE178318_genes.tsv.gz",
+        barcodes="resources/human_sc/Che/GSE178318_barcodes.tsv.gz",
+        pelka="results/human_sc/data/Pelka.h5ad",
+    output:
+        h5ad="results/human_sc/data/Che.h5ad",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    resources:
+        mem_mb=62000
+    log:
+        "logs/human_sc/hsc_make_Che_count_adata.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_make_Che_count_adata.tsv"
+    script:
+        "make_Che_count_adata.py"
+
+rule hsc_download_Che_count_data:
+    output:
+        "resources/human_sc/Che/GSE178318_matrix.mtx.gz",
+        "resources/human_sc/Che/GSE178318_genes.tsv.gz",
+        "resources/human_sc/Che/GSE178318_barcodes.tsv.gz",
+    log:
+        "logs/human_sc/hsc_download_Che_count_data.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_download_Che_count_data.tsv"
+    shell:
+        '(mkdir -p resources/human_sc/Che/ && '
+        'pushd resources/human_sc/Che/ && '
+        'wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE178nnn/GSE178318/suppl/GSE178318_matrix.mtx.gz && '
+        'wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE178nnn/GSE178318/suppl/GSE178318_genes.tsv.gz && '
+        'wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE178nnn/GSE178318/suppl/GSE178318_barcodes.tsv.gz) &> {log}'
+
+rule hsc_make_Khaliq_count_adata:
+    input:
+        counts="resources/human_sc/Khaliq/GSE200997_GEO_processed_CRC_10X_raw_UMI_count_matrix.csv.gz",
+        anno="resources/human_sc/Khaliq/GSE200997_GEO_processed_CRC_10X_cell_annotation.csv.gz",
+        pelka="results/human_sc/data/Pelka.h5ad",
+    output:
+        h5ad="results/human_sc/data/Khaliq.h5ad",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    resources:
+        mem_mb=48000
+    log:
+        "logs/human_sc/hsc_make_Khaliq_count_adata.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_make_Khaliq_count_adata.tsv"
+    script:
+        "make_Khaliq_count_adata.py"
+
+rule hsc_download_Khaliq_count_data:
+    output:
+        "resources/human_sc/Khaliq/GSE200997_GEO_processed_CRC_10X_raw_UMI_count_matrix.csv.gz",
+        "resources/human_sc/Khaliq/GSE200997_GEO_processed_CRC_10X_cell_annotation.csv.gz",
+    log:
+        "logs/human_sc/hsc_download_Khaliq_count_data.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_download_Khaliq_count_data.tsv"
+    shell:
+        '(mkdir -p resources/human_sc/Khaliq/ && '
+        'pushd resources/human_sc/Khaliq/ && '
+        'wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE200nnn/GSE200997/suppl/GSE200997_GEO_processed_CRC_10X_cell_annotation.csv.gz && '
+        'wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE200nnn/GSE200997/suppl/GSE200997_GEO_processed_CRC_10X_raw_UMI_count_matrix.csv.gz) &> {log}'
+
+rule hsc_make_Zheng_count_adata:
+    input:
+        tar="resources/human_sc/Zheng/GSE161277_RAW.tar",
+        pelka="results/human_sc/data/Pelka.h5ad",
+    output:
+        h5ad="results/human_sc/data/Zheng.h5ad",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    resources:
+        mem_mb=30000
+    log:
+        "logs/human_sc/hsc_make_Zheng_count_adata.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_make_Zheng_count_adata.tsv"
+    script:
+        "make_Zheng_count_adata.py"
+
+rule hsc_download_Zheng_count_archive:
+    output:
+        "resources/human_sc/Zheng/GSE161277_RAW.tar",
+    log:
+        "logs/human_sc/hsc_download_Zheng_count_archive.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_download_Zheng_count_archive.tsv"
+    shell:
+        '(mkdir -p resources/human_sc/Zheng/ && '
+        'pushd resources/human_sc/Zheng/ && '
+        'wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE161nnn/GSE161277/suppl/GSE161277_RAW.tar) &> {log}'
+
+rule hsc_make_Becker_count_adata:
+    input:
+        tar="resources/human_sc/Becker/GSE201348_RAW.tar",
+        xlsx="resources/human_sc/Becker/41588_2022_1088_MOESM3_ESM.xlsx",
+        pelka="results/human_sc/data/Pelka.h5ad",
+    output:
+        h5ad="results/human_sc/data/Becker.h5ad",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    resources:
+        mem_mb=40000
+    log:
+        "logs/human_sc/hsc_make_Becker_count_adata.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_make_Becker_count_adata.tsv"
+    script:
+        "make_Becker_count_adata.py"
+
+rule hsc_download_Becker_count_archive:
+    output:
+        "resources/human_sc/Becker/GSE201348_RAW.tar",
+        "resources/human_sc/Becker/41588_2022_1088_MOESM3_ESM.xlsx",
+    log:
+        "logs/human_sc/hsc_download_Becker_count_archive.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_download_Becker_count_archive.tsv"
+    shell:
+        '(mkdir -p resources/human_sc/Becker/ && '
+        'pushd resources/human_sc/Becker/ && '
+        'wget "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE201348&format=file" -O GSE201348_RAW.tar && '
+        'wget https://static-content.springer.com/esm/art%3A10.1038%2Fs41588-022-01088-x/MediaObjects/41588_2022_1088_MOESM3_ESM.xlsx) &> {log}'
+
+rule hsc_make_Pelka_count_adata:
+    input:
+        h5="resources/human_sc/Pelka/GSE178341_crc10x_full_c295v4_submit.h5",
+        anno_cluster="resources/human_sc/Pelka/GSE178341_crc10x_full_c295v4_submit_cluster.csv.gz",
+        anno_meta="resources/human_sc/Pelka/GSE178341_crc10x_full_c295v4_submit_metatables.csv.gz",
+        ccNMF_CellAct="resources/human_sc/Pelka/ccNMF_CellAct_Hmat/",
+        ccNMF_GeneWeight="resources/human_sc/Pelka/ccNMF_GeneWeight_Wmat/",
+    output:
+        h5ad="results/human_sc/data/Pelka.h5ad",
+    conda:
+        "../envs/TACCO_notebook_env.yml"
+    resources:
+        mem_mb=32000
+    log:
+        "logs/human_sc/hsc_make_Pelka_count_adata.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_make_Pelka_count_adata.tsv"
+    script:
+        "make_Pelka_count_adata.py"
+
+rule hsc_download_Pelka_count_data:
+    output:
+        "resources/human_sc/Pelka/GSE178341_crc10x_full_c295v4_submit.h5",
+        "resources/human_sc/Pelka/GSE178341_crc10x_full_c295v4_submit_cluster.csv.gz",
+        "resources/human_sc/Pelka/GSE178341_crc10x_full_c295v4_submit_metatables.csv.gz",
+        directory("resources/human_sc/Pelka/ccNMF_CellAct_Hmat/"),
+        directory("resources/human_sc/Pelka/ccNMF_GeneWeight_Wmat/"),
+    log:
+        "logs/human_sc/hsc_download_Pelka_count_data.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_download_Pelka_count_data.tsv"
+    shell:
+        '(mkdir -p resources/human_sc/Pelka/ && '
+        'pushd resources/human_sc/Pelka/ && '
+        'wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE178nnn/GSE178341/suppl/GSE178341_crc10x_full_c295v4_submit.h5 && '
+        'wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE178nnn/GSE178341/suppl/GSE178341_crc10x_full_c295v4_submit_cluster.csv.gz && '
+        'wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE178nnn/GSE178341/suppl/GSE178341_crc10x_full_c295v4_submit_metatables.csv.gz && '
+        'wget  -r -np -nH --cut-dirs=3 -R "index.html*" https://portals.broadinstitute.org/crc-immune-hubs/extra/data/ccNMF_CellAct_Hmat/ && '
+        'wget  -r -np -nH --cut-dirs=3 -R "index.html*" https://portals.broadinstitute.org/crc-immune-hubs/extra/data/ccNMF_GeneWeight_Wmat/) &> {log}'
+
+rule hsc_download_MGI_homology_data:
+    output:
+        "resources/human_sc/MGI/HOM_AllOrganism.rpt",
+    log:
+        "logs/human_sc/hsc_download_MGI_homology_data.log"
+    benchmark:
+        "benchmarks/human_sc/hsc_download_MGI_homology_data.tsv"
+    shell:
+        '(mkdir -p resources/human_sc/MGI/ && '
+        'pushd resources/human_sc/MGI/ && '
+        'wget http://www.informatics.jax.org/downloads/reports/HOM_AllOrganism.rpt) &> {log}'

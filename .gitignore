@@ -1,0 +1,10 @@
+/logs/
+/resources/
+/results/
+/benchmarks/
+/notebooks/
+.snakemake/
+.ipynb_checkpoints/
+*.pdf
+*.png
+__pycache__/

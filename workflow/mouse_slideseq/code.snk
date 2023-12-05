@@ -1,0 +1,12 @@
+
+def mouse_slideseq_targets():
+    return [
+        "notebooks/mouse_slideseq.ipynb",
+        "notebooks/mouse_slideseq_commot.ipynb"
+    ]
+
+def get_mouse_slideseq_SampleIDs():
+    return ['cont7_P', 'cont8_P', 'cont9_P', 'cont10_P', 'AV10a_P', 'AV10b_P', 'AV11a_P', 'AV11b_P', 'AV12_P', 'AV13_P', ]
+
+def get_mouse_slideseq_collect_commot_inputs(wildcards):
+    return [f"results/mouse_slideseq/data/commot_per_sample/{sample}.h5ad" for sample in get_mouse_slideseq_SampleIDs()]

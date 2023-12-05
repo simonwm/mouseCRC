@@ -1,0 +1,6 @@
+
+def mouse_sc_targets():
+    return [
+        "notebooks/mouse_sc.ipynb",
+        "notebooks/mouse_sc_velocity.ipynb",
+    ]

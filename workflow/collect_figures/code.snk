@@ -1,0 +1,196 @@
+import os
+import shutil
+
+def get_figure_map():
+    return {
+        '1b_cluster': 'results/mouse_sc/plots/mouse_sc_umap_cluster.pdf',
+        '1b_labels': 'results/mouse_sc/plots/mouse_sc_umap_labels.pdf',
+        '1c': 'results/mouse_sc/plots/mouse_sc_umap_cluster_by_state.pdf',
+        '1d': 'results/mouse_sc/plots/mouse_sc_skyline_labels_vs_state.pdf',
+        '1e': 'results/mouse_cartana/plots/mouse_cartana_v2_Mono2_Mono3_Gran_Sell_Ccr2_Ptprc_Cd14.pdf', # only first row
+        
+        'SF1a': 'results/mouse_sc/plots/mouse_sc_labels_marker.pdf',
+        'SF1b': 'results/mouse_sc/plots/mouse_sc_umap_State.pdf',
+        'SF1c': 'results/mouse_sc/plots/mouse_sc_umap_compartment.pdf',
+        'SF1d': 'results/mouse_sc/plots/mouse_sc_skyline_cluster_vs_state.pdf',
+        'SF1e': 'results/mouse_sc/plots/mouse_sc_enrichment_cluster_vs_state.pdf',
+        'SF1f': 'results/mouse_cartana/plots/mouse_cartana_skyline_labels_vs_state.pdf',
+        'SF1g': 'results/mouse_cartana/plots/mouse_cartana_scrna_slideseq_correspondence_delta_labels.pdf',
+        'SF1h': 'results/mouse_cartana/plots/mouse_cartana_scrna_slideseq_correspondence_delta_genes.pdf',
+        
+        '2a': 'results/mouse_sc/plots/mouse_sc_epithelial_umap_cluster.pdf',
+        '2b': 'results/mouse_sc/plots/mouse_sc_epithelial_skyline_cluster_vs_state.pdf',
+        '2c': 'results/mouse_sc/plots/mouse_sc_epithelial_marker_dot_extra_rotated.pdf',
+        '2d': 'results/mouse_sc/plots/mouse_sc_epithelial_program_weights.pdf',
+        '2e': 'results/mouse_sc/plots/mouse_sc_epithelial_skyline_program_vs_state.pdf',
+        '2f': 'results/mouse_sc/plots/mouse_sc_epithelial_stem_marker.pdf',
+        
+        'SF2a': 'results/mouse_sc/plots/mouse_sc_immune_umap_cluster.pdf',
+        'SF2b': 'results/mouse_sc/plots/mouse_sc_immune_skyline_cluster_vs_state.pdf',
+        'SF2c': 'results/mouse_sc/plots/mouse_sc_immune_cluster_marker.pdf',
+        'SF2d': 'results/mouse_sc/plots/mouse_sc_myeloid_umap_cluster.pdf',
+        'SF2e': 'results/mouse_sc/plots/mouse_sc_myeloid_skyline_cluster_vs_state.pdf',
+        'SF2f': 'results/mouse_sc/plots/mouse_sc_myeloid_cluster_marker.pdf',
+        'SF2g': 'results/mouse_sc/plots/mouse_sc_tnk_umap_cluster.pdf',
+        'SF2h': 'results/mouse_sc/plots/mouse_sc_tnk_skyline_cluster_vs_state.pdf',
+        'SF2i': 'results/mouse_sc/plots/mouse_sc_tnk_cluster_marker.pdf',
+        'SF2j': 'results/mouse_sc/plots/mouse_sc_tnk_enrichment_cluster_vs_state.pdf',
+        'SF2k_umap': 'results/human_sc/plots/human_sc_tnk_composition_umap.pdf',
+        'SF2k_occ': 'results/human_sc/plots/human_sc_tnk_composition_occ.pdf',
+        'SF2l': 'results/mouse_sc/plots/mouse_sc_stromal_umap_cluster.pdf',
+        'SF2m': 'results/mouse_sc/plots/mouse_sc_stromal_skyline_cluster_vs_state.pdf',
+        'SF2n': 'results/mouse_sc/plots/mouse_sc_stromal_cluster_marker.pdf',
+        'SF2o': 'results/mouse_sc/plots/mouse_sc_stromal_enrichment_cluster_vs_state.pdf',
+        'SF2p': 'results/mouse_sc/plots/mouse_sc_myeloid_Vegfa.pdf',
+        
+        'SF3ab': 'results/mouse_sc/plots/velocity_per_cluster_and_State_after_batch_correction_highlight_proliferation.pdf',
+        'SF3c': 'results/mouse_sc/plots/velocity_per_program_and_State_after_batch_correction.pdf',
+        
+        'SF4a': 'results/mouse_sc/plots/mouse_sc_epithelial_umap_cluster_by_state.pdf',
+        'SF4b': 'results/mouse_sc/plots/mouse_sc_epithelial_PC.pdf',
+        'SF4c': 'results/mouse_sc/plots/mouse_sc_epithelial_marker_dot_extra_ED_rotated.pdf',
+        'SF4d': 'results/mouse_sc/plots/mouse_sc_epithelial_enrichment_tdTomato_vs_cluster.pdf',
+        'SF4e_1': 'results/mouse_sc/plots/mouse_sc_epithelial_marker_violin.pdf',
+        'SF4e_2': 'results/mouse_sc/plots/mouse_sc_immune_marker_violin.pdf',
+        'SF4f': 'results/mouse_sc/plots/mouse_sc_epithelial_umap_prog2.pdf',
+        'SF4g': 'results/mouse_sc/plots/mouse_sc_epithelial_umap_prog5.pdf',
+        'SF4h': 'results/mouse_sc/plots/mouse_sc_epithelial_umap_prog8.pdf',
+        'SF4i': 'results/mouse_sc/plots/mouse_sc_epithelial_umap_prog4.pdf',
+        'SF4j': 'results/mouse_sc/plots/mouse_sc_epithelial_umap_prog14.pdf',
+        'SF4k': 'results/mouse_sc/plots/mouse_sc_epithelial_umap_prog6.pdf',
+        'SF4l': 'results/mouse_sc/plots/mouse_sc_epithelial_umap_prog7.pdf',
+        'SF4m': 'results/mouse_sc/plots/mouse_sc_epithelial_enrichment_program_vs_state.pdf',
+        
+        '3a': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_normal_20umP10.pdf',
+        '3b': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_premalignant_20umP10.pdf',
+        '3c': 'results/mouse_slideseq/plots/mouse_slideseq_scatter_labels.pdf',
+        
+        'SF5a_pEpi': 'results/human_sc/plots/human_sc_pEpi_similarity_with_mouse_epi_programs.pdf',
+        'SF5a_pEpiTp': 'results/human_sc/plots/human_sc_pEpiTp_similarity_with_mouse_epi_programs.pdf',
+        'SF5a_pEpiTd': 'results/human_sc/plots/human_sc_pEpiTd_similarity_with_mouse_epi_programs.pdf',
+        'SF5b': 'results/human_sc/plots/human_sc_enrichment_epithelial_programs_vs_State_per_species.pdf',
+        'SF5c': 'results/human_sc/plots/human_sc_labels_associations_across_samples.pdf',
+        'SF5d': 'results/human_sc/plots/human_sc_program_associations_across_samples.pdf',
+
+        'SF6a': 'results/mouse_slideseq/plots/mouse_slideseq_scatter_umis.pdf',
+        'SF6b': 'results/mouse_slideseq/plots/mouse_slideseq_scatter_ngenes.pdf',
+        'SF6d': 'results/mouse_slideseq/plots/mouse_slideseq_scatter_marker.pdf',
+        'SF6e': 'results/mouse_slideseq/plots/mouse_slideseq_composition_cluster_vs_state.pdf',
+        'SF6f': 'results/mouse_slideseq/plots/mouse_slideseq_composition_program_vs_state.pdf',
+        'SF6g': 'results/mouse_slideseq/plots/mouse_slideseq_enrichment_cluster3_vs_state.pdf',
+        'SF6h': 'results/mouse_slideseq/plots/mouse_slideseq_enrichment_program_vs_state.pdf',
+        
+        'SF7a_00': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_normal_40umP10.pdf',
+        'SF7a_01': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_normal_60umP10.pdf',
+        'SF7a_10': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_premalignant_40umP10.pdf',
+        'SF7a_11': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_premalignant_60umP10.pdf',
+        'SF7b_00': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_normal_20umP5.pdf',
+        'SF7b_01': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_normal_20umP50.pdf',
+        'SF7b_10': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_premalignant_20umP5.pdf',
+        'SF7b_11': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_premalignant_20umP50.pdf',
+        'SF7c': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_normal_epi_cluster_from_epi_cluster.pdf',
+        'SF7d': 'results/mouse_cartana/plots/mouse_cartana_cooc_normal_epi_cluster_from_epi_cluster.pdf',
+        'SF7e': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_20umP10_hist.pdf',
+        'SF7f': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_premalignant_20umP10_clustered.pdf',
+        'SF7g': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_premalignant_myeloid_cluster_from_endothelial.pdf',
+        'SF7h': 'results/mouse_cartana/plots/mouse_cartana_cooc_premalignant_myeloid_cluster_from_endothelial.pdf',
+        
+        '4a': 'results/mouse_slideseq/plots/mouse_slideseq_scatter_region.pdf',
+        '4b': 'results/mouse_slideseq/plots/mouse_slideseq_enrichment_cluster3_vs_region_plain.pdf',
+        '4c': 'results/mouse_slideseq/plots/mouse_slideseq_enrichment_program_vs_region_plain.pdf',
+        '4d': 'results/mouse_slideseq/plots/mouse_slideseq_enrichment_region_vs_state_plain.pdf',
+        '4e': 'results/mouse_slideseq/plots/mouse_slideseq_normal_tissue_regions.pdf',
+        '4f': 'results/mouse_slideseq/plots/mouse_slideseq_normal_tissue_regions_marker.pdf',
+        '4g': 'results/mouse_slideseq/plots/mouse_slideseq_malignant_tissue_regions.pdf',
+        '4h_all': 'results/mouse_slideseq/plots/mouse_slideseq_malignant_tissue_regions_marker_all.pdf',
+        '4h_epithelial': 'results/mouse_slideseq/plots/mouse_slideseq_malignant_tissue_regions_marker_epithelial.pdf',
+        '4h_immune': 'results/mouse_slideseq/plots/mouse_slideseq_malignant_tissue_regions_marker_immune.pdf',
+        '4h_stromal': 'results/mouse_slideseq/plots/mouse_slideseq_malignant_tissue_regions_marker_stromal.pdf',
+        '4i': 'results/mouse_slideseq/plots/mouse_slideseq_enrichment_program_vs_regionState_plain.pdf',
+        '4j': 'results/mouse_slideseq/plots/mouse_slideseq_enrichment_cluster3_vs_regionState_plain.pdf',
+        '4k': 'results/mouse_slideseq/plots/spatial_split_bidirectional_communication_pathway_per_State_scatter.pdf',
+        
+        'SF8a': 'results/mouse_slideseq/plots/mouse_slideseq_composition_region_vs_sample.pdf',
+        'SF8c': 'results/mouse_slideseq/plots/mouse_slideseq_coord_region_vs_state.pdf',
+        'SF8d_Region6': 'results/mouse_slideseq/plots/mouse_slideseq_coord_region_vs_Region6.pdf',
+        'SF8d_Region8': 'results/mouse_slideseq/plots/mouse_slideseq_coord_region_vs_Region8.pdf',
+        'SF8d_Region11': 'results/mouse_slideseq/plots/mouse_slideseq_coord_region_vs_Region11.pdf',
+        'SF8e': 'results/mouse_slideseq/plots/mouse_slideseq_region6_labels_marker_dot.pdf',
+        'SF8f': 'results/mouse_slideseq/plots/mouse_slideseq_malignantregions_marker_dot.pdf',
+        'SF8g_Region6': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_premalignant_labels_in_Region6_20umP10.pdf',
+        'SF8g_Region8': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_premalignant_labels_in_Region8_20umP10.pdf',
+        'SF8g_Region11': 'results/mouse_slideseq/plots/mouse_slideseq_cooc_premalignant_labels_in_Region11_20umP10.pdf',
+        'SF8h': 'results/mouse_cartana/plots/mouse_cartana_Pericytes_and_Endothelial_marker_cooc_v2_premalignant.pdf',
+        'SF8i': 'results/mouse_slideseq/plots/spatial_split_bidirectional_communication_pathway_per_region_scatter.pdf',
+        
+        '5a': 'results/human_sc/plots/human_sc_enrichment_region_vs_State_per_compartment_human_plain.pdf',
+        '5b_scatter_significances': 'results/human_sc/plots/epi_aR_region_score_pca.pdf',
+        '5b_loadings': 'results/human_sc/plots/epi_aR_region_score_pca_pc1_loadings.pdf',
+        '5c': 'results/human_sc/plots/epi_aR_region_score_significance_welch_reordered.pdf',
+        '5d': 'results/tcga/plots/mR_tcga_survival_PFI.pdf',
+        '5e': 'results/tcga/plots/mR_tcga_survival_OS.pdf',
+        
+        
+        'SF9a_epithelial': 'results/human_sc/plots/human_sc_enrichment_region_vs_State_per_dataset_epithelial_plain.pdf',
+        'SF9a_immune': 'results/human_sc/plots/human_sc_enrichment_region_vs_State_per_dataset_immune_plain.pdf',
+        'SF9a_stromal': 'results/human_sc/plots/human_sc_enrichment_region_vs_State_per_dataset_stromal_plain.pdf',
+        'SF9b_state': 'results/human_sc/plots/epi_aR_region_score_pca_simple-State.pdf',
+        'SF9b_source': 'results/human_sc/plots/epi_aR_region_score_pca_source.pdf',
+        'SF9c': 'results/human_sc/plots/epi_aR_region_score_CMS_enrichment_welch.pdf',
+        'SF9d_MMRd': 'results/tcga/plots/mR_tcga_MSI_survival_PFI.pdf',
+        'SF9d_MMRp': 'results/tcga/plots/mR_tcga_MSS_survival_PFI.pdf',
+        'SF9e_MMRd': 'results/tcga/plots/mR_tcga_MSI_survival_OS.pdf',
+        'SF9e_MMRp': 'results/tcga/plots/mR_tcga_MSS_survival_OS.pdf',
+        
+        'SI1a': 'results/mouse_cartana/plots/mouse_cartana_scrna_slideseq_correspondence_normal_labels.pdf',
+        'SI1b': 'results/mouse_cartana/plots/mouse_cartana_scrna_slideseq_correspondence_premalignant_labels.pdf',
+        'SI1c': 'results/mouse_cartana/plots/mouse_cartana_scrna_slideseq_correspondence_normal_genes.pdf',
+        'SI1d': 'results/mouse_cartana/plots/mouse_cartana_scrna_slideseq_correspondence_premalignant_genes.pdf',
+        
+        'SI2ab': 'results/mouse_cartana/plots/mouse_cartana_v2_Mono2_Mono3_Gran_Sell_Ccr2_Ptprc_Cd14.pdf',
+
+        'SI3a': 'results/mouse_cartana/plots/mouse_cartana_labels_genes_per_TLS_v2_premalignant.pdf',
+        'SI3b': 'results/mouse_cartana/plots/mouse_cartana_v2_premalignant_TLS.pdf',
+        
+        'SI4a': 'results/mouse_slideseq/plots/spatial_split_bidirectional_communication_pathway_per_State_heatmap.pdf',
+        'SI4b': 'results/mouse_slideseq/plots/spatial_split_bidirectional_communication_pathway_per_region_heatmap.pdf',
+        'SI4c': 'results/mouse_slideseq/plots/spatial_split_bidirectional_communication_pathway_per_State.pdf',
+        'SI4d': 'results/mouse_slideseq/plots/spatial_split_bidirectional_communication_pathway_per_region.pdf',
+        
+    }
+
+def collect_figures_inputs(notebook=None):
+    if notebook is None:
+        inputs = [ *get_figure_map().values() ]
+    elif notebook == 'mouse_sc':
+        inputs = [ v for v in get_figure_map().values() if 'mouse_sc_' in v ]
+    elif notebook == 'mouse_sc_velocity':
+        inputs = [ v for v in get_figure_map().values() if 'velocity_' in v ]
+    elif notebook == 'mouse_slideseq':
+        inputs = [ v for v in get_figure_map().values() if 'mouse_slideseq_' in v ]
+    elif notebook == 'mouse_slideseq_commot':
+        inputs = [ v for v in get_figure_map().values() if '_communication_' in v ]
+    elif notebook == 'mouse_cartana':
+        inputs = [ v for v in get_figure_map().values() if 'mouse_cartana_' in v ]
+    elif notebook == 'human_sc':
+        inputs = [ v for v in get_figure_map().values() if 'human_sc_' in v ]
+    elif notebook == 'human_sc_cross_study':
+        inputs = [ v for v in get_figure_map().values() if 'epi_aR_region_score_' in v ]
+    elif notebook == 'tcga':
+        inputs = [ v for v in get_figure_map().values() if 'mR_tcga_' in v ]
+    else:
+        raise ValueError(f'The notebook specifier {notebook} is unknown!')
+    return list(set(inputs))
+
+def get_figure_dir():
+    return "results/figures/"
+
+def collect_figures_targets():
+    figure_dir = get_figure_dir()
+    return [ f'{figure_dir}{outfile}.pdf' for outfile in get_figure_map().keys() ]
+
+def collect_figures():
+    figure_dir = get_figure_dir()
+    os.makedirs(figure_dir, exist_ok=True)
+    for outfile, infile in get_figure_map().items():
+        shutil.copy(infile, f'{figure_dir}{outfile}.pdf')
