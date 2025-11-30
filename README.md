@@ -1,6 +1,6 @@
 # mouseCRC
 
-This repository contains the anlysis code for the paper "Spatially defined multicellular functional units in colorectal cancer revealed from single cell and spatial transcriptomics" https://doi.org/10.1101/2022.10.02.508492 .
+This repository contains the anlysis code for the paper "Spatially defined multicellular functional units in colorectal cancer revealed from single cell and spatial transcriptomics" https://doi.org/10.7554/eLife.104815 .
 
 ## How to use this repository
 
